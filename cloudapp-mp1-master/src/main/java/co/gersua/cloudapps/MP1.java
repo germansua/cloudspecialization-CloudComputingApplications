@@ -1,7 +1,6 @@
 package co.gersua.cloudapps;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -53,8 +52,59 @@ public class MP1 {
 
     public String[] process() throws Exception {
         String[] ret = new String[20];
-       
-        //TODO
+
+        Map<String, Integer> wordCount = new HashMap<>();
+        List<String> stopWords = Arrays.asList(stopWordsArray);
+        List<Integer> indices = Arrays.asList(getIndexes());
+        List<String> lines = new ArrayList<>(50000);
+
+        File file = new File(inputFileName);
+        Scanner scanner = new Scanner(file);
+
+        while (scanner.hasNext()) {
+            lines.add(scanner.nextLine());
+        }
+
+        for (int index : indices) {
+            /* Read the line and tokenize it using delimiter */
+            String line = lines.get(index);
+            StringTokenizer tokenizer = new StringTokenizer(line, delimiters);
+
+            /* Start comparing words */
+            while (tokenizer.hasMoreTokens()) {
+                String word = tokenizer.nextToken().trim().toLowerCase();
+
+                if (stopWords.contains(word)) {
+                    continue;
+                }
+
+                /* Count words */
+                if (wordCount.containsKey(word)) {
+                    wordCount.put(word, wordCount.get(word) + 1);
+                } else {
+                    wordCount.put(word, 1);
+                }
+            }
+        }
+
+        List<Map.Entry<String, Integer>> entries = new ArrayList<>(1000);
+        entries.addAll(wordCount.entrySet());
+
+        Collections.sort(entries, new Comparator<Map.Entry<String, Integer>>() {
+            @Override
+            public int compare(Map.Entry<String, Integer> entry1, Map.Entry<String, Integer> entry2) {
+
+                if (entry1.getValue().equals(entry2.getValue())) {
+                    return entry1.getKey().compareTo(entry2.getKey());
+                }
+
+                return entry2.getValue().compareTo(entry1.getValue());
+            }
+        });
+
+        for (int i = 0; i < 20; i++) {
+            ret[i] = entries.get(i).getKey();
+        }
 
         return ret;
     }
